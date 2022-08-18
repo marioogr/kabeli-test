@@ -17,6 +17,10 @@ import { AppService } from './app.service';
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
+        password:
+          process.env.NODE_ENV === 'development'
+            ? configService.get('REDIS_PASSWORD')
+            : undefined,
         isGlobal: true,
       }),
       inject: [ConfigService],
