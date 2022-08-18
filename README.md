@@ -1,6 +1,6 @@
 ## Descripción
 
-Micro servicio authprepago
+Micro servicio
 
 ## Estructura
 ```
