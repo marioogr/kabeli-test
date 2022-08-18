@@ -21,7 +21,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "composer-up": "docker-compose -f docker-compose.yaml up -d",
     "postinstall": "husky install",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "typeorm": "ts-node ./node_modules/typeorm/cli",
+    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./type-orm-config.ts",
+    "typeorm:generate-migration": "npm run typeorm -- -d ./type-orm-config.ts migration:generate ./src/_common/migrations/$npm_config_name",
+    "typeorm:create-migration": "npm run typeorm -- migration:create ./src/_common/migrations/$npm_config_name",
+    "typeorm:revert-migration": "npm run typeorm -- -d ./type-orm-config.ts migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -29,11 +34,14 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.0.5",
+    "@nestjs/typeorm": "^9.0.1",
     "cache-manager": "^4.1.0",
     "cache-manager-redis-store": "^2.0.0",
+    "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "typeorm": "^0.3.7"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -80,6 +88,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
+      "npm run lint",
       "npm run format",
       "git add"
     ]
