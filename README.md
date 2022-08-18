@@ -21,18 +21,9 @@ Micro servicio
 │   │   │   └── index.ts
 │   │   ├── dtos
 │   │   │   └── index.ts
-│   │   ├── entities
-│   │   │   ├── canal.entity.ts
-│   │   │   ├── evento.entity.ts
+│   │   ├── entities 
 │   │   │   ├── index.ts
-│   │   │   ├── rol.entity.ts
-│   │   │   ├── tipo-evento.entity.ts
-│   │   │   ├── token-key.entity.ts
-│   │   │   ├── token.entity.ts
-│   │   │   ├── usuario-canal.entity.ts
-│   │   │   └── usuario.entity.ts
 │   │   ├── enums
-│   │   │   ├── db-types.enum.ts
 │   │   │   └── index.ts
 │   │   ├── guards
 │   │   │   └── index.ts
