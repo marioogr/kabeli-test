@@ -1,6 +1,6 @@
 ## Descripción
 
-Micro servicio
+Micro servicio authprepago
 
 ## Estructura
 ```
@@ -21,8 +21,16 @@ Micro servicio
 │   │   │   └── index.ts
 │   │   ├── dtos
 │   │   │   └── index.ts
-│   │   ├── entities 
+│   │   ├── entities
+│   │   │   ├── canal.entity.ts
+│   │   │   ├── evento.entity.ts
 │   │   │   ├── index.ts
+│   │   │   ├── rol.entity.ts
+│   │   │   ├── tipo-evento.entity.ts
+│   │   │   ├── token-key.entity.ts
+│   │   │   ├── token.entity.ts
+│   │   │   ├── usuario-canal.entity.ts
+│   │   │   └── usuario.entity.ts
 │   │   ├── enums
 │   │   │   └── index.ts
 │   │   ├── guards

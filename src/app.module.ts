@@ -1,12 +1,19 @@
-import { Module, CacheModule } from '@nestjs/common';
+import { Module, CacheModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import type { ClientOpts } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from '@common/logger/logger.module';
+import { CoopeuchModule } from '@coopuech/coopeuch.module';
+import { RepositoryModule } from '@repository/repository.module';
+import { GlobalExceptionsFilter } from '@filters';
+import { HealthModule } from '@src/health/health.module';
 
 @Module({
   imports: [
@@ -15,7 +22,7 @@ import { AppService } from './app.service';
       envFilePath: ['.env.local', '.env'],
     }),
     CacheModule.registerAsync<ClientOpts>({
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService<NodeJS.ProcessEnv>) => ({
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
@@ -23,12 +30,13 @@ import { AppService } from './app.service';
           process.env.NODE_ENV === 'development'
             ? configService.get('REDIS_PASSWORD')
             : undefined,
-        isGlobal: true,
+        ttl: 780,
       }),
+      isGlobal: true,
       inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService<NodeJS.ProcessEnv>) => {
         const typeOrmConfig = {
           type: configService.get<'postgres'>('DB_SOURCE'),
           host: configService.get('DB_HOST'),
@@ -48,8 +56,27 @@ import { AppService } from './app.service';
       },
       inject: [ConfigService],
     }),
+    LoggerModule,
+    CoopeuchModule,
+    RepositoryModule,
+    AuthModule,
+    HealthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
