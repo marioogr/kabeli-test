@@ -13,7 +13,6 @@ import { LoggerModule } from '@common/logger/logger.module';
 import { CoopeuchModule } from '@coopuech/coopeuch.module';
 import { RepositoryModule } from '@repository/repository.module';
 import { GlobalExceptionsFilter } from '@filters';
-import { HealthModule } from '@src/health/health.module';
 
 @Module({
   imports: [
@@ -60,7 +59,6 @@ import { HealthModule } from '@src/health/health.module';
     CoopeuchModule,
     RepositoryModule,
     AuthModule,
-    HealthModule,
   ],
   controllers: [AppController],
   providers: [
