@@ -1,10 +1,16 @@
-import { Module, CacheModule, ValidationPipe } from '@nestjs/common';
+import {
+  Module,
+  CacheModule,
+  ValidationPipe,
+  NestModule,
+  MiddlewareConsumer,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import type { ClientOpts } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +19,8 @@ import { LoggerModule } from '@common/logger/logger.module';
 import { CoopeuchModule } from '@coopuech/coopeuch.module';
 import { RepositoryModule } from '@repository/repository.module';
 import { GlobalExceptionsFilter } from '@filters';
+import { LoggerInterceptor } from './_common/interceptor';
+import { LoggerMiddleware } from './_common/middleware';
 
 @Module({
   imports: [
@@ -38,7 +46,7 @@ import { GlobalExceptionsFilter } from '@filters';
       useFactory: (configService: ConfigService<NodeJS.ProcessEnv>) => {
         const typeOrmConfig = {
           type: configService.get<'postgres'>('DB_SOURCE'),
-          host: configService.get('DB_HOST'),
+          host: configService.get('DB_HOST_WRITE'),
           port: +configService.get('DB_PORT'),
           username: configService.get('DB_USER'),
           password: configService.get('DB_PASSWORD'),
@@ -49,6 +57,24 @@ import { GlobalExceptionsFilter } from '@filters';
           synchronize: true,
           entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
           logging: process.env.NODE_ENV === 'development',
+          replication: {
+            master: {
+              host: configService.get('DB_HOST_WRITE'),
+              port: +configService.get('DB_PORT'),
+              username: configService.get('DB_USER'),
+              password: configService.get('DB_PASSWORD'),
+              database: configService.get('DB_DATABASE'),
+            },
+            slaves: [
+              {
+                host: configService.get('DB_HOST_READ'),
+                port: +configService.get('DB_PORT'),
+                username: configService.get('DB_USER'),
+                password: configService.get('DB_PASSWORD'),
+                database: configService.get('DB_DATABASE'),
+              },
+            ],
+          },
         };
 
         return typeOrmConfig;
@@ -75,6 +101,14 @@ import { GlobalExceptionsFilter } from '@filters';
       provide: APP_FILTER,
       useClass: GlobalExceptionsFilter,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
+    },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
