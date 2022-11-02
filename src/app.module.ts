@@ -33,10 +33,7 @@ import { LoggerMiddleware } from './_common/middleware';
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
-        password:
-          process.env.NODE_ENV === 'development'
-            ? configService.get('REDIS_PASSWORD')
-            : undefined,
+        password: configService.get('REDIS_PASSWORD'),
         ttl: 780,
       }),
       isGlobal: true,
