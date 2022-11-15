@@ -22,11 +22,12 @@
     "composer-up": "docker-compose -f docker-compose.yaml up -d",
     "postinstall": "husky install",
     "lint-staged": "lint-staged",
-    "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "typeorm:run-migrations": "npm run typeorm migration:run -- -d ./type-orm-config.ts",
-    "typeorm:generate-migration": "npm run typeorm -- -d ./type-orm-config.ts migration:generate ./src/_common/migrations/$npm_config_name",
-    "typeorm:create-migration": "npm run typeorm -- migration:create ./src/_common/migrations/$npm_config_name",
-    "typeorm:revert-migration": "npm run typeorm -- -d ./type-orm-config.ts migration:revert"
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ormconfig.ts",
+    "typeorm:migration:generate": "npm run typeorm -- migration:generate -n",
+    "typeorm:migration:run": "NODE_ENV=production npm run typeorm -- migration:run",
+    "typeorm:migration:revert": "NODE_ENV=production npm run typeorm -- migration:revert",
+    "typeorm:migration:run:dev": "NODE_ENV=development npm run typeorm -- migration:run",
+    "typeorm:migration:revert:dev": "NODE_ENV=development npm run typeorm -- migration:revert"
   },
   "dependencies": {
     "@nestjs/axios": "^0.1.0",
@@ -49,7 +50,7 @@
     "rimraf": "^3.0.2",
     "rut.js": "^2.1.0",
     "rxjs": "^7.2.0",
-    "typeorm": "^0.3.7"
+    "typeorm": "^0.3.10"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

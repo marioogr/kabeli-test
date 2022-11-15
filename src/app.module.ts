@@ -8,19 +8,19 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import type { ClientOpts } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as path from 'path';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from '@auth/auth.module';
 import { LoggerModule } from '@common/logger/logger.module';
 import { CoopeuchModule } from '@coopuech/coopeuch.module';
 import { RepositoryModule } from '@repository/repository.module';
 import { GlobalExceptionsFilter } from '@filters';
-import { LoggerInterceptor } from './_common/interceptor';
-import { LoggerMiddleware } from './_common/middleware';
+import { LoggerInterceptor } from '@common/interceptor';
+import { LoggerMiddleware } from '@common/middleware';
 
 @Module({
   imports: [
@@ -40,8 +40,8 @@ import { LoggerMiddleware } from './_common/middleware';
       inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService<NodeJS.ProcessEnv>) => {
-        const typeOrmConfig = {
+      useFactory: (configService: ConfigService<NodeJS.ProcessEnv>) =>
+        ({
           type: configService.get<'postgres'>('DB_SOURCE'),
           host: configService.get('DB_HOST_WRITE'),
           port: +configService.get('DB_PORT'),
@@ -50,10 +50,10 @@ import { LoggerMiddleware } from './_common/middleware';
           database: configService.get('DB_DATABASE'),
           autoLoadEntities: true,
           keepConnectionAlive: true,
-          // TODO: dejarlo en false y generar una migracion inicial | conversar si se deja en sincronizacion
-          synchronize: true,
+          synchronize: process.env.NODE_ENV === 'development',
           entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
           logging: process.env.NODE_ENV === 'development',
+          migrations: [path.join(__dirname, '**', '*.migration.{ts,js}')],
           replication: {
             master: {
               host: configService.get('DB_HOST_WRITE'),
@@ -72,10 +72,7 @@ import { LoggerMiddleware } from './_common/middleware';
               },
             ],
           },
-        };
-
-        return typeOrmConfig;
-      },
+        } as TypeOrmModuleOptions),
       inject: [ConfigService],
     }),
     LoggerModule,

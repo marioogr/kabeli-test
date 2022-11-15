@@ -1,6 +1,6 @@
 ## Descripción
 
-Micro servicio authprepago
+Micro servicio
 
 ## Estructura
 ```
@@ -64,44 +64,54 @@ Micro servicio authprepago
 
 
 ```
-## Installation
+## Instalacion
 
 ```bash
+# Paquetes
 $ npm install
+# Contenedores de docker
 $ npm run composer-up
 ```
 
 ##Migraciones
 
 ###Correr migraciones
+
+
 ```bash
-$ npm run typeorm:run-migrations
+# Producción
+$ npm run typeorm:migration:run
+
+# Local
+$ npm run typeorm:migration:run:dev
 ```
 
 ###Crear migracion
 ```bash
-$ npm run typeorm:create-migration --name=nombre
-```
-
-###Generar migracion
-```bash
-$ npm run typeorm:generate-migration --name=nombre
+$ npm run typeorm:migration:generate --name=nombre-migracion
 ```
 
 ###Revertir ultima migracion
 ```bash
-$ npm run typeorm:revert-migration
+#Producción 
+$ npm run typeorm:migration:revert
+
+# Local
+$ npm run typeorm:migration:revert:dev
 ```
 
-##Archivo .env 
+##Archivo .env
 Se debe de generar un archivo tomando como base el .env.example y asignar los valores respectivos, el .env se toma dependiendo del ambiente, estos son los nombre de archivos validos
 ```bash
+#Produción
 .env
+
+#Local
 .env.local
 ```
 
 
-## Running the app
+## Correr el micro servicio
 
 ```bash
 # development
