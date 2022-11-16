@@ -14,13 +14,13 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from '@auth/auth.module';
 import { LoggerModule } from '@common/logger/logger.module';
 import { CoopeuchModule } from '@coopuech/coopeuch.module';
 import { RepositoryModule } from '@repository/repository.module';
 import { GlobalExceptionsFilter } from '@filters';
 import { LoggerInterceptor } from '@common/interceptor';
 import { LoggerMiddleware } from '@common/middleware';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -75,10 +75,24 @@ import { LoggerMiddleware } from '@common/middleware';
         } as TypeOrmModuleOptions),
       inject: [ConfigService],
     }),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        privateKey: configService.get('JWT_PRIVATE_KEY'),
+        publicKey: configService.get('JWT_PUBLIC_KEY'),
+        signOptions: {
+          // algorithm: configService.get('JWT_ALGORITHM'),
+          expiresIn: configService.get('JWT_EXPIRES_IN'),
+          // header: {
+          //   kid: 'Coopeuch Chile',
+          //   alg: configService.get('JWT_ALGORITHM'),
+          // },
+        },
+      }),
+    }),
     LoggerModule,
     CoopeuchModule,
     RepositoryModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [
