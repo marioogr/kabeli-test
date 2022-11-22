@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: _app_name_
+  namespace: _namespace_
+  name: _app_name_
+spec:
+  selector:
+    matchLabels:
+      app: _app_name_
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: _app_name_
+    spec:
+      containers:
+      - env:
+        envFrom:
+        - secretRef:
+            name: _app_name_
+        image: _uri_ecr_/_app_name_:_tag_
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/v1/health
+            port: _port_
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: _app_name_
+        ports:
+        - containerPort: _port_
+          protocol: TCP          
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /api/v1/health
+            port: _port_
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: _lcp_
+            memory: _lmm_
+          requests:
+            cpu: _rcp_
+            memory: _rmm_
+        securityContext:
+          allowPrivilegeEscalation: false          
+          capabilities:
+            drop:
+            - ALL
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /coopeuch/.env
+          name: conf-volumen
+          subPath: .env
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - name: conf-volumen
+        secret:
+          defaultMode: 420
+          items:
+          - key: .env
+            path: .env
+          secretName: _app_name_
