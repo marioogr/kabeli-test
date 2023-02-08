@@ -21,6 +21,7 @@ import { GlobalExceptionsFilter } from '@filters';
 import { LoggerInterceptor } from '@common/interceptor';
 import { LoggerMiddleware } from '@common/middleware';
 import { JwtModule } from '@nestjs/jwt';
+import { IndexModule } from './index/index.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { JwtModule } from '@nestjs/jwt';
     LoggerModule,
     CoopeuchModule,
     RepositoryModule,
+    IndexModule,
   ],
   controllers: [AppController],
   providers: [
