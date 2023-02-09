@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class GetIndexDto {
+export class IndexDto {
   @IsNotEmpty()
   @IsString()
   codigo: string;
@@ -19,4 +19,22 @@ export class GetIndexDto {
 
   @IsNotEmpty()
   valor: number;
+}
+
+export class GetIndexDto {
+  @IsNotEmpty()
+  @IsString()
+  version: string;
+
+  @IsNotEmpty()
+  @IsString()
+  autor: string;
+
+  @IsNotEmpty()
+  @IsString()
+  fecha: string;
+
+  @IsNotEmpty()
+  @IsString()
+  values: IndexDto[];
 }

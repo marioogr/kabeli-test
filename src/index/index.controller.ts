@@ -1,29 +1,29 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { IndexService } from './index.service';
-import { CreateIndexDto } from './dto/create-index.dto';
 import { UpdateIndexDto } from './dto/update-index.dto';
+import { indexInfoObject } from './index.const';
+import { GetIndexDto, IndexDto } from './dto/get-index.dto';
 
 @Controller('index')
 export class IndexController {
   constructor(private readonly indexService: IndexService) {}
 
-  @Post()
-  create(@Body() createIndexDto: CreateIndexDto) {
-    return this.indexService.create(createIndexDto);
-  }
-
   @Get()
-  async findAll() {
+  async findAll(): Promise<GetIndexDto> {
     const response = await this.indexService.findAll();
-    return response.data;
+    const indexData = response.data;
+    const info = {
+      version: indexData.version,
+      autor: indexData.autor,
+      fecha: indexData.fecha,
+    };
+    const data = Object.values(indexData).filter(
+      (item) => typeof item === 'object',
+    );
+    return {
+      ...info,
+      values: data as IndexDto[],
+    };
   }
 
   @Get(':id')
